@@ -1,5 +1,5 @@
 {
-  "required_api_version": "2",
+  "required_api_version": "^2.0.0",
   "name": "Password Manager",
   "description": "A Ulauncher extension that allows you to quickly open the Google's Password manager website by typing a keyword.",
   "developer_name": "Herson Douglas",
