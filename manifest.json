@@ -1,20 +1,13 @@
 {
   "required_api_version": "^2.0.0",
-  "name": "Password Manager",
-  "description": "A Ulauncher extension that allows you to quickly open the Google's Password manager website by typing a keyword.",
+  "name": "URLauncher",
+  "description": "A Ulauncher extension that allows you to quickly open a website by typing or pasting am URL.",
   "developer_name": "Herson Douglas",
   "icon": "images/icon.png",
   "options": {
     "query_debounce": 0.1
   },
   "preferences": [
-    {
-      "id": "website_url",
-      "type": "input",
-      "name": "Website URL",
-      "description": "Enter the URL of the website you want to launch quickly.",
-      "default_value": "https://notion.so"
-    },
     {
       "id": "launch_keyword",
       "type": "keyword",
