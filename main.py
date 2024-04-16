@@ -1,47 +1,43 @@
-import re
 import webbrowser
 
-from ulauncher.api.client.EventListener import KeywordQueryEventListener
+from ulauncher.api.client.EventListener import EventListener
 from ulauncher.api.client.Extension import Extension
-from ulauncher.api.shared.action.OpenUrlAction import OpenUrlAction
+from ulauncher.api.shared.action.ExtensionCustomAction import \
+    ExtensionCustomAction
+from ulauncher.api.shared.action.HideWindowAction import HideWindowAction
 from ulauncher.api.shared.action.RenderResultListAction import \
     RenderResultListAction
-from ulauncher.api.shared.action.ShowNotificationAction import \
-    ShowNotificationAction
+from ulauncher.api.shared.event import ItemEnterEvent, KeywordQueryEvent
 from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
 
-
-def is_valid_url(url):
-    regex = re.compile(
-        r'^(?:http|https)://',
-        re.IGNORECASE
-    )
-    return re.match(regex, url) is not None
 
 class OpenUrlExtension(Extension):
 
     def __init__(self):
         super(OpenUrlExtension, self).__init__()
-        self.subscribe(KeywordQueryEventListener(), self.on_keyword_query)
+        self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
+        self.subscribe(ItemEnterEvent, ItemEnterEventListener())
 
-    def on_keyword_query(self, event):
-        query = event.get_argument()
-        if not query or not is_valid_url(query):
-            return RenderResultListAction([
-                ExtensionResultItem(icon='images/icon.png',
-                                    name='Invalid URL',
-                                    description='Please enter a valid URL starting with http:// or https://',
-                                    on_enter=ShowNotificationAction("Invalid URL entered"))
-            ])
-
+class KeywordQueryEventListener(EventListener):
+    def on_event(self, event, extension):
+        query = event.get_argument() or ''
         items = [
-            ExtensionResultItem(icon='images/icon.png',
-                                name='Open URL',
-                                description='Press Enter to open: %s' % query,
-                                on_enter=OpenUrlAction(query))
+            ExtensionResultItem(
+                icon='images/icon.png',
+                name='Open URL',
+                description='Press Enter to open: {}'.format(query),
+                on_enter=ExtensionCustomAction(query)
+            )
         ]
+
         return RenderResultListAction(items)
 
+class ItemEnterEventListener(EventListener):
+    def on_event(self, event, extension):
+        query = event.get_data() or ''
+        if not query.startswith(('http://', 'https://')):
+            query = 'http://' + query
+        webbrowser.open_new_tab(query)
 
 if __name__ == '__main__':
     OpenUrlExtension().run()
