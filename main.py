@@ -10,18 +10,14 @@ from ulauncher.api.shared.action.RenderResultListAction import \
 from ulauncher.api.shared.event import ItemEnterEvent, KeywordQueryEvent
 from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
 
-ICON_PATH = 'images/icon.png'
-DEFAULT_URL_PROTOCOL = 'http://'
+from bookmark_manager import add_bookmark, load_bookmarks
+from constants import DEFAULT_URL_PROTOCOL, ICON_PATH
 
 
-def format_url(url):
-    if not url.startswith(('http://', 'https://')):
-        url = DEFAULT_URL_PROTOCOL + url
-    return url
-
-
-def open_url(url):
-    webbrowser.open_new_tab(format_url(url))
+def format_query(query):
+    if not query.startswith(('http://', 'https://')):
+        query = DEFAULT_URL_PROTOCOL + query
+    return query
 
 
 class OpenUrlExtension(Extension):
@@ -34,24 +30,44 @@ class OpenUrlExtension(Extension):
 class KeywordQueryEventListener(EventListener):
     def on_event(self, event, extension):
         query = event.get_argument() or ''
-        items = [
-            ExtensionResultItem(
-                icon='images/icon.png',
-                name='Open URL',
-                description='Press Enter to open: {}'.format(query),
-                on_enter=ExtensionCustomAction(query)
-            )
-        ]
+        bookmarks = load_bookmarks()
+        items = []
 
+        if query == "bookmark":
+            for url in bookmarks.values():
+                items.append(self.create_result_item(
+                    url, "Click to open bookmarked URL"))
+        else:
+            items.append(self.create_result_item(query))
+            items.append(ExtensionResultItem(
+                icon=ICON_PATH,
+                name='Bookmark this URL',
+                description='Press Enter to bookmark: {}'.format(query),
+                on_enter=ExtensionCustomAction(
+                    ('bookmark', query), keep_app_open=False)
+            ))
         return RenderResultListAction(items)
+
+    @staticmethod
+    def create_result_item(query):
+        return ExtensionResultItem(
+            icon=ICON_PATH,
+            name='Open URL',
+            description='Press Enter to open: {}'.format(query),
+            on_enter=ExtensionCustomAction(query)
+        )
 
 
 class ItemEnterEventListener(EventListener):
     def on_event(self, event, extension):
-        query = event.get_data() or ''
-        if not query.startswith(('http://', 'https://')):
-            query = 'http://' + query
-        open_url(query)
+        data = event.get_data()
+        if isinstance(data, tuple) and data[0] == 'bookmark':
+            add_bookmark(data[1])
+            return HideWindowAction()
+
+        query = data or ''
+        formatted_query = format_query(query)
+        webbrowser.open_new_tab(formatted_query)
 
 
 if __name__ == '__main__':
