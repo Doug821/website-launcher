@@ -29,14 +29,18 @@ class OpenUrlExtension(Extension):
 
 class KeywordQueryEventListener(EventListener):
     def on_event(self, event, extension):
-        query = event.get_argument() or ''
+        query = event.get_argument()
         bookmarks = load_bookmarks()
         items = []
 
-        if query == "bookmark":
-            for url in bookmarks.values():
-                items.append(self.create_result_item(
-                    url, "Click to open bookmarked URL"))
+        if not query:
+            for url in bookmarks.items():
+                items.append(ExtensionResultItem(
+                    icon=ICON_PATH,
+                    name='Open Bookmark: ' + url,
+                    description='URL: ' + url,
+                    on_enter=ExtensionCustomAction(url)
+                ))
         else:
             items.append(self.create_result_item(query))
             items.append(ExtensionResultItem(
