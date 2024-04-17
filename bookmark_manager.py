@@ -1,15 +1,16 @@
 # bookmark_manager.py
 import json
-import os
 
 from constants import BOOKMARKS_FILE
 
 
 def load_bookmarks():
-    if not os.path.exists(BOOKMARKS_FILE):
+    try:
+        with open(BOOKMARKS_FILE, 'r') as file:
+            return json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("No valid bookmarks file found, starting with an empty dictionary.")
         return {}
-    with open(BOOKMARKS_FILE, 'r') as file:
-        return json.load(file)
 
 
 def save_bookmarks(bookmarks):
