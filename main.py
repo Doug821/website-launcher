@@ -33,6 +33,13 @@ class KeywordQueryEventListener(EventListener):
         bookmarks = load_bookmarks()
         items = []
 
+        if not bookmarks:
+            items.append(ExtensionResultItem(
+                icon=ICON_PATH,
+                name='No bookmarks found',
+                description='Add a bookmark to open a URL'
+            ))
+
         if not query:
             for url in bookmarks.items():
                 items.append(ExtensionResultItem(
