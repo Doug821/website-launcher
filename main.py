@@ -33,7 +33,9 @@ class KeywordQueryEventListener(EventListener):
         bookmarks = load_bookmarks()
         items = []
 
-        if not bookmarks:
+        print("bookmarks.items(): ", bookmarks.items())
+
+        if not bookmarks.items():
             items.append(ExtensionResultItem(
                 icon=ICON_PATH,
                 name='No bookmarks found',

@@ -13,7 +13,7 @@
       "type": "keyword",
       "name": "Launch Keyword",
       "description": "Keyword to activate the website launcher.",
-      "default_value": "pm"
+      "default_value": "url"
     }
   ]
 }
