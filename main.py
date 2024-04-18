@@ -38,9 +38,9 @@ class KeywordQueryEventListener(EventListener):
                 for url in bookmarks.items():
                     items.append(ExtensionResultItem(
                         icon=ICON_PATH,
-                        name='Open Bookmark: ' + url,
-                        description='URL: ' + url,
-                        on_enter=ExtensionCustomAction(url)
+                        name='Open Bookmark',
+                        description='URL: ' + url[1],
+                        on_enter=ExtensionCustomAction(url[1])
                     ))
             else:
                 items.append(ExtensionResultItem(

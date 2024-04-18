@@ -1,4 +1,3 @@
-# bookmark_manager.py
 import json
 
 from constants import BOOKMARKS_FILE
